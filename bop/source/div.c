@@ -1,6 +1,6 @@
 #include "shared.h"
 
-int divide(const char* n1, const char* n2, char** quotient, char** remainder, size_t bits) {
+extern int divide(const char* n1, const char* n2, char** quotient, char** remainder, size_t bits) {
 
     char* out = (char*)malloc(bits + 1);
     memset(out, '0', bits);

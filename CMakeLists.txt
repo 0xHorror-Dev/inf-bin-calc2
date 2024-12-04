@@ -5,4 +5,4 @@ project("inf-bin-calc2")
 add_subdirectory("bop")
 add_executable("calc" "source/main.c")
 
-target_link_libraries("calc" bops)
+target_link_libraries("calc" PUBLIC bops)

@@ -1,14 +1,34 @@
 #include "shared.h"
 
-void babs(char* n, size_t bits)
+extern void from_additional_code_to_base(char* n, size_t bits)
+{
+    char* one = malloc(bits);
+    char* out = NULL;
+    memset(one, '0', bits);
+    one[bits - 1] = '\0';
+    one[bits - 2] = '1';
+    substract(n, one, &out, bits);
+    free(one);
+
+    for (size_t i = 0; i < bits; i++) {
+        out[i] = (out[i] == '0') ? '1' : '0';
+    }
+
+    out[bits] = '\0';
+    strcpy(n, out);
+
+    free(out);
+}
+
+extern void babs(char* n, size_t bits)
 {
     if (n[0] == '1')
     {
-        from_additional_code_to_base(n, bits);
+        from_base_code_to_additional(n, bits);
     }
 }
 
-void neg(char* n, size_t bits)
+extern void neg(char* n, size_t bits)
 {
     if (n[0] == '1')
     {
@@ -22,27 +42,77 @@ void neg(char* n, size_t bits)
 
 }
 
-void print_bin_buffer(char* buffer)
+extern void print_bin_buffer(char* buffer, const uint8_t sep)
 {
     for(size_t i = 0; buffer[i] != '\0'; i += 1)
     {
-        //if(i % 4 == 0 && i != 0) putchar(' ');
+        if(i % sep == 0 && i != 0) putchar(' ');
         putchar(buffer[i]);
     }
-    putchar('\n');
 }
 
-void xor (const char* n1, const char* n2, char** out, size_t bits)
+void bin_hex(char* ibin, char** out_buff, size_t bits)
 {
-    *out = malloc(bits);
-    char* rbuf = *out;
-
-    for (size_t i = 0; i < bits; i += 1)
-    {
+    if (ibin == NULL || *ibin == '\0') {
+        return NULL;
     }
+
+    char* bin = malloc(bits + 1);
+    memset(bin, 0, 0);
+    strcpy(bin, ibin);
+
+    if (bin[0] == '1')
+    {
+        from_additional_code_to_base(bin, bits);
+    }
+
+    free(bin);
+
+    // Find the length of the binary string
+    size_t binaryLen = bits;
+
+    // Calculate the length of the hexadecimal string
+    size_t hexLen = (binaryLen + 3) / 4; // Each hex digit = 4 bits
+    char* hex = (char*)malloc(hexLen + 1); // Allocate memory for hex string
+    if (!hex) {
+        printf("allocation failed!");
+        return NULL; 
+    }
+    hex[hexLen] = '\0'; // Null-terminate the string
+
+    // Padding the binary string to make its length a multiple of 4
+    size_t paddedLen = hexLen * 4;
+    char* paddedBinary = (char*)malloc(paddedLen + 1);
+    if (!paddedBinary) 
+    {
+        printf("allocation failed!");
+        free(hex);
+        return NULL; // Allocation failed
+    }
+    size_t padSize = paddedLen - binaryLen;
+    memset(paddedBinary, '0', padSize); // Fill with leading zeros
+    strcpy(paddedBinary + padSize, bin); // Copy the original binary string
+
+    // Conversion from binary to hexadecimal
+    for (size_t i = 0; i < hexLen; i++) 
+    {
+        char chunk[5]; // Temporary buffer for a 4-bit chunk
+        strncpy(chunk, paddedBinary + i * 4, 4);
+        chunk[4] = '\0'; // Null-terminate the chunk
+
+        // Convert 4 bits to a hexadecimal digit
+        int decimalValue = (chunk[0] - '0') * 8 + (chunk[1] - '0') * 4 +
+            (chunk[2] - '0') * 2 + (chunk[3] - '0');
+        hex[i] = decimalValue < 10 ? ('0' + decimalValue) : ('A' + decimalValue - 10);
+    }
+
+    *out_buff = hex;
+
+    free(paddedBinary); 
+    free(bin);
 }
 
-void rshift(char* binary, size_t bits, size_t shift_count) {
+extern void rshift(char* binary, size_t bits, size_t shift_count) {
     if (shift_count == 0) return;
 
     // Adjust the shift_count if it's greater than the number of bits
@@ -59,7 +129,7 @@ void rshift(char* binary, size_t bits, size_t shift_count) {
     }
 }
 
-void shift(char* binary, size_t bits, size_t shift_count) {
+extern void shift(char* binary, size_t bits, size_t shift_count) {
     if (shift_count == 0) return;
     shift_count -= 1;
     for (size_t i = 0; i < bits - shift_count; i++) {
@@ -70,7 +140,7 @@ void shift(char* binary, size_t bits, size_t shift_count) {
     }
 }
 
-void or (const char* n1, const char* n2, char** out, size_t bits)
+extern void or (const char* n1, const char* n2, char** out, size_t bits)
 {
     *out = malloc(bits + 1);
     char* o = *out;
@@ -84,4 +154,15 @@ void or (const char* n1, const char* n2, char** out, size_t bits)
     }
 
     o[bits] = '\0';
+}
+
+
+void xor (const char* n1, const char* n2, char** out, size_t bits)
+{
+    *out = malloc(bits);
+    char* rbuf = *out;
+
+    for (size_t i = 0; i < bits; i += 1)
+    {
+    }
 }

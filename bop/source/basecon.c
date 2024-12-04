@@ -1,6 +1,127 @@
 #include "shared.h"
 
-void from_base_code_to_additional(char* n, size_t bits)
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdint.h>
+
+// Function to multiply a decimal string by a base and add a digit (to handle large numbers)
+inline void multiply_and_add(char* result, int base, int digit_value) {
+    int carry = 0;
+    int length = strlen(result);
+
+    for (int i = length - 1; i >= 0; i--) {
+        int value = (result[i] - '0') * base + carry;
+        if (i == length - 1) value += digit_value; // Add digit value to the last position
+        result[i] = (value % 10) + '0';
+        carry = value / 10;
+    }
+
+    // Handle overflow by shifting the result
+    if (carry > 0) {
+        memmove(result + 1, result, length + 1);
+        result[0] = carry + '0';
+    }
+}
+
+// Convert the decimal string to binary
+inline void decimal_to_binary(const char* decimal, char* binary_result, size_t bin_res_size, uint8_t is_neg) {
+    memset(binary_result, '0', bin_res_size);
+    binary_result[bin_res_size - 1] = '\0'; // Null-terminate the binary string
+
+    char temp[512];
+    strncpy(temp, decimal, sizeof(temp) - 1);
+    temp[sizeof(temp) - 1] = '\0';
+
+    int binary_index = bin_res_size - 2; // Start filling binary from the second last position
+
+    // Perform repeated division by 2
+    while (strlen(temp) > 0 && !(strlen(temp) == 1 && temp[0] == '0')) {
+        int remainder = 0;
+        char next_temp[512] = { 0 };
+        int next_index = 0;
+
+        for (int i = 0; i < strlen(temp); i++) {
+            int current = remainder * 10 + (temp[i] - '0');
+            next_temp[next_index++] = (current / 2) + '0';
+            remainder = current % 2;
+        }
+
+        // Remove leading zeros in the next_temp
+        int start = 0;
+        while (next_temp[start] == '0' && start < next_index - 1) {
+            start++;
+        }
+
+        strncpy(temp, next_temp + start, sizeof(temp) - 1);
+        temp[sizeof(temp) - 1] = '\0';
+
+        if (binary_index < 0) {
+            printf("Error: Binary result buffer too small to store the result.\n");
+            return;
+        }
+
+        binary_result[binary_index--] = remainder + '0';
+    }
+
+    // Fill the remaining positions with leading zeros
+    while (binary_index >= 0) {
+        binary_result[binary_index--] = '0';
+    }
+}
+
+// Apply two's complement if the number is negative
+inline void apply_twos_complement(char* binary_result, size_t bin_res_size) {
+    // Flip the bits
+    for (size_t i = 0; i < bin_res_size - 1; i++) {
+        binary_result[i] = (binary_result[i] == '0') ? '1' : '0';
+    }
+
+    // Add 1 to the binary number
+    int carry = 1;
+    for (int i = bin_res_size - 2; i >= 0 && carry > 0; i--) {
+        if (binary_result[i] == '1') {
+            binary_result[i] = '0';
+        }
+        else {
+            binary_result[i] = '1';
+            carry = 0;
+        }
+    }
+}
+
+// Main conversion function
+extern void from_base_to_binary(const char* base_number, int base, uint8_t is_neg, char* binary_result, size_t bin_res_size) {
+    char decimal[512] = "0"; // Store as a decimal string
+
+    for (size_t i = 0; i < strlen(base_number); i++) {
+        char digit = base_number[i];
+        int digit_value;
+
+        if (isdigit(digit)) {
+            digit_value = digit - '0';
+        }
+        else if (isalpha(digit)) {
+            digit_value = toupper(digit) - 'A' + 10;
+        }
+        else {
+            printf("Invalid digit '%c' in the number for base %d\n", digit, base);
+            return;
+        }
+
+        multiply_and_add(decimal, base, digit_value);
+    }
+
+    // Convert decimal string to binary
+    decimal_to_binary(decimal, binary_result, bin_res_size, is_neg);
+
+    // Apply two's complement if the number is negative
+    if (is_neg) {
+        apply_twos_complement(binary_result, bin_res_size);
+    }
+}
+
+extern void from_base_code_to_additional(char* n, size_t bits)
 {
     for (size_t i = 1; i < bits; i++) {
         n[i] = (n[i] == '0') ? '1' : '0';
@@ -17,10 +138,9 @@ void from_base_code_to_additional(char* n, size_t bits)
     strcpy(n, out);
 
     free(out);
-
 }
 
-void into_add_code(char* n, size_t bits)
+extern  void into_add_code(char* n, size_t bits)
 {
     char* inv_n2 = malloc(bits + 1);  // Allocate space for the null-terminator
     if (inv_n2 == NULL) {

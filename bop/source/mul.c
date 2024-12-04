@@ -1,6 +1,6 @@
 #include "shared.h"
 
-int mul(const char* n1, const char* n2, char** obuf, size_t bits) {
+extern int mul(const char* n1, const char* n2, char** obuf, size_t bits) {
     char* out = (char*)malloc(bits + 1);
     memset(out, '0', bits);
     out[bits] = '\0';
@@ -17,7 +17,8 @@ int mul(const char* n1, const char* n2, char** obuf, size_t bits) {
         is_neg = 1;
         from_additional_code_to_base(n1_tmp, bits);
     }
-    else if (n2[0] == '1')
+    
+    if (n2[0] == '1')
     {
         if (is_neg)
             is_neg = 0;
@@ -31,8 +32,6 @@ int mul(const char* n1, const char* n2, char** obuf, size_t bits) {
         char c = n2_tmp[i];
         if (c == '1')
         {
-
-
             char* tmp = (char*)malloc(bits + 1);
             char* tmp2 = NULL;
             strcpy(tmp, n1_tmp);
