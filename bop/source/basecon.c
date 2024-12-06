@@ -5,6 +5,26 @@
 #include <ctype.h>
 #include <stdint.h>
 
+
+
+
+extern int bin_cmp(const char* n1, const char* n2, size_t bits) {
+
+    // Compare bit by bit
+    for (size_t i = 0; i < bits; ++i) {
+        if (n1[i] > n2[i]) {
+            return 1;  // n1 is greater than n2
+        }
+        else if (n1[i] < n2[i]) {
+            return -1; // n1 is less than n2
+        }
+    }
+
+    return 0;  // n1 is equal to n2
+}
+
+
+
 // Function to multiply a decimal string by a base and add a digit (to handle large numbers)
 inline void multiply_and_add(char* result, int base, int digit_value) {
     int carry = 0;
@@ -123,9 +143,6 @@ extern void from_base_to_binary(const char* base_number, int base, uint8_t is_ne
 
 extern void from_base_code_to_additional(char* n, size_t bits)
 {
-    for (size_t i = 1; i < bits; i++) {
-        n[i] = (n[i] == '0') ? '1' : '0';
-    }
     char* one = malloc(bits + 1);
     char* out = NULL;
     memset(one, '0', bits);
@@ -134,6 +151,10 @@ extern void from_base_code_to_additional(char* n, size_t bits)
     printf("%s\n", n);
     sum(n, one, &out, bits, 0);
     free(one);
+
+    for (size_t i = 0; i < bits; i++) {
+        out[i] = (out[i] == '0') ? '1' : '0';
+    }
 
     strcpy(n, out);
 

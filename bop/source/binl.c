@@ -2,29 +2,33 @@
 
 extern void from_additional_code_to_base(char* n, size_t bits)
 {
-    char* one = malloc(bits);
-    char* out = NULL;
-    memset(one, '0', bits);
-    one[bits - 1] = '\0';
-    one[bits - 2] = '1';
-    substract(n, one, &out, bits);
-    free(one);
 
     for (size_t i = 0; i < bits; i++) {
-        out[i] = (out[i] == '0') ? '1' : '0';
+        n[i] = (n[i] == '0') ? '1' : '0';
     }
 
-    out[bits] = '\0';
-    strcpy(n, out);
+    n[bits] = '\0';
+    //char* one = malloc(bits+1);
+    //char* out = NULL;
+    //memset(one, '0', bits+1);
+    //one[bits] = '\0';
+    //one[bits-1] = '1';
+    //sum(n, one, &out, bits,0);
+    //free(one);
 
-    free(out);
+    //out[bits] = '\0';
+    //strcpy(n, out);
+
+    //free(out);
 }
 
 extern void babs(char* n, size_t bits)
 {
     if (n[0] == '1')
     {
-        from_base_code_to_additional(n, bits);
+        from_additional_code_to_base(n, bits);
+        memmove(n, n + 1, bits + 1);
+        n[0] = '0';
     }
 }
 
@@ -66,7 +70,6 @@ void bin_hex(char* ibin, char** out_buff, size_t bits)
         from_additional_code_to_base(bin, bits);
     }
 
-    free(bin);
 
     // Find the length of the binary string
     size_t binaryLen = bits;

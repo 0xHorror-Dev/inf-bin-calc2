@@ -2,6 +2,15 @@
 
 extern int substract(const char* n1, const char* n2, char** obuf, size_t bits)
 {
+    if (bin_cmp(n1, n2, bits) == 0)
+    {
+        char* buff = malloc(bits + 1);
+        memset(buff, '0', bits);
+        buff[bits] = '\0';
+        *obuf = buff;
+        return 0;
+    }
+
     //char* inv_n2 = malloc(bits + 1);  // Allocate space for the null-terminator
     //if (inv_n2 == NULL) return -1;    // Check for memory allocation failure
 
@@ -82,7 +91,7 @@ extern int substract(const char* n1, const char* n2, char** obuf, size_t bits)
         free(one);  // Free the temporary 'one' buffer
 
         if (result != 0) { // Check for addition failure
-            free(inv_n2);
+            //free(inv_n2);
             return -1;
         }
     }
@@ -128,7 +137,11 @@ extern int substract(const char* n1, const char* n2, char** obuf, size_t bits)
 
     // Perform the subtraction (n1 + temp_buf)
     result = sum(n1, temp_buf, obuf, bits, 1);
-
+    if (result == 1)
+    {
+        memmove(*obuf, (*obuf) + 1, bits + 1);
+    }
+    
     free(inv_n2);
     free(temp_buf); // Only free temp_buf if it was dynamically allocated (if sum function allocates it)
 

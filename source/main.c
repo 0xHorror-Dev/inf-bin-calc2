@@ -55,6 +55,8 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
         is_gneg =  is_gneg || (is_neg == 1 ? 1 : 0);
     }
 
+    free(res_buff);
+
     switch (op)
     {
     case '*':
@@ -64,6 +66,14 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
         }
         break;
     case '/':
+    {
+        char* q;
+        if (singed_division(xb, yb, &res_buff, &q, bits) == 1)
+        {
+            printf("division overflow\n");
+        }
+        free(q);
+    }
         break;
     case '+':
         if (sum(xb, yb, &res_buff, bits - 1, 1) == 1)
@@ -106,6 +116,7 @@ int main()
 {
     //perform_operation("-12", "10", 10, '+', 32);
     //perform_operation("-12", "-10", 10, '*', 32);
-    perform_operation("-12", "10", 10, '-', 32);
+    //perform_operation("-12", "10", 10, '-', 32);
+    perform_operation("16", "2", 10, '/', 32);
     return 0;
 }
