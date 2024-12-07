@@ -117,6 +117,69 @@ void lshift(char* binary, size_t bits, size_t shift_count)
     }
 }
 
+int compareBinary(const char* dividend, const char* divisor) {
+
+    // Получаем длины строк
+
+    int len_dividend = strlen(dividend);
+
+    int len_divisor = strlen(divisor);
+
+
+    // Сравниваем длины
+
+    if (len_dividend < len_divisor) {
+
+        return 0; // temp_divisor > temp_dividend
+
+    }
+    else if (len_dividend > len_divisor) {
+
+        return 1; // temp_divisor <= temp_dividend
+
+    }
+    else {
+
+        // Если длины равны, сравниваем поразрядно
+
+        return strcmp(dividend, divisor) >= 0; // temp_divisor <= temp_dividend
+
+    }
+
+}
+
+int compareBinaryle(const char* remainder, const char* divisor) {
+
+    // Получаем длины строк
+
+    int len_remainder = strlen(remainder);
+
+    int len_divisor = strlen(divisor);
+
+
+    // Сравниваем длины
+
+    if (len_remainder < len_divisor) {
+
+        return 0; // *remainder < temp_divisor
+
+    }
+    else if (len_remainder > len_divisor) {
+
+        return 1; // *remainder >= temp_divisor
+
+    }
+    else {
+
+        // Если длины равны, сравниваем поразрядно
+
+        return strcmp(remainder, divisor) >= 0; // *remainder >= temp_divisor
+
+    }
+
+}
+
+
 extern int unsigned_divide(const char* n1, const char* n2, char** quotient, char** remainder, size_t bits) 
 {
     char* out = (char*)malloc(bits + 1);
@@ -129,7 +192,7 @@ extern int unsigned_divide(const char* n1, const char* n2, char** quotient, char
     strcpy(divisor, n2);
 
     size_t sc = 0;
-    while (bin_lt(dividend, divisor, bits))
+    while (compareBinary(dividend, divisor))
     {
         puts(divisor);
         lshift(divisor, bits - 1, 1);
@@ -137,8 +200,8 @@ extern int unsigned_divide(const char* n1, const char* n2, char** quotient, char
         sc += 1;
     }
 
-    //rshift(divisor, bits, 1);
-    //sc -= 1;
+    rshift(divisor, bits, 1);
+    sc -= 1;
 
     *quotient = (char*)malloc(bits + 1);
     memset(*quotient, '0', bits);
@@ -154,10 +217,10 @@ extern int unsigned_divide(const char* n1, const char* n2, char** quotient, char
     {
         lshift(q, bits, 1);
 
-        if (bin_gt(r, divisor, bits) >= 0)
+        if (compareBinaryle(r, divisor))
         {
             char* tmp = NULL;
-            unsigned_binary_subtract(r, divisor, &tmp, bits - 1);
+            unsigned_binary_subtract(r, divisor, &tmp, bits);
             strcpy(r, tmp);
             free(tmp);
 

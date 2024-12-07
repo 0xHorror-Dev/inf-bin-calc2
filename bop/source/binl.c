@@ -8,18 +8,18 @@ extern void from_additional_code_to_base(char* n, size_t bits)
     }
 
     n[bits] = '\0';
-    //char* one = malloc(bits+1);
-    //char* out = NULL;
-    //memset(one, '0', bits+1);
-    //one[bits] = '\0';
-    //one[bits-1] = '1';
-    //sum(n, one, &out, bits,0);
-    //free(one);
+    char* one = malloc(bits+1);
+    char* out = NULL;
+    memset(one, '0', bits+1);
+    one[bits] = '\0';
+    one[bits-1] = '1';
+    sum(n, one, &out, bits,0);
+    free(one);
 
-    //out[bits] = '\0';
-    //strcpy(n, out);
+    out[bits] = '\0';
+    strcpy(n, out);
 
-    //free(out);
+    free(out);
 }
 
 extern void babs(char* n, size_t bits)

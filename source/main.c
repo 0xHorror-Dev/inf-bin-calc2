@@ -1,5 +1,6 @@
 #include "shared.h"
-#define SEP_CONST -1
+//#define SEP_CONST -1
+#define SEP_CONST 4
 
 void perform_operation(const char* x, const char* y, const uint8_t base, const char op, const size_t bits)
 {
@@ -32,7 +33,7 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
         }
 
         is_gneg = is_neg == 1 ? 1 : 0;
-        from_base_to_binary(xb, base, is_neg, res_buff, bits);
+        from_base_to_binary(xb, base, is_neg, res_buff, bits + 1);
         print_bin_buffer(res_buff, SEP_CONST);
         putchar('\n');
         memcpy(xb, res_buff, bits + 1);
@@ -48,7 +49,7 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
         }
 
         memset(res_buff, 0, bits);
-        from_base_to_binary(yb, base, is_neg, res_buff, bits);
+        from_base_to_binary(yb, base, is_neg, res_buff, bits + 1);
         print_bin_buffer(res_buff, SEP_CONST);
         putchar('\n');
         memcpy(yb, res_buff, bits + 1);
@@ -76,7 +77,7 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
     }
         break;
     case '+':
-        if (sum(xb, yb, &res_buff, bits - 1, 1) == 1)
+        if (sum(xb, yb, &res_buff, bits, 1) == 1)
         {
             if (is_gneg)
             {
@@ -117,6 +118,7 @@ int main()
     //perform_operation("-12", "10", 10, '+', 32);
     //perform_operation("-12", "-10", 10, '*', 32);
     //perform_operation("-12", "10", 10, '-', 32);
-    perform_operation("16", "2", 10, '/', 32);
+    perform_operation("116", "2", 10, '/', 32);
+    //perform_operation("20", "2", 10, '/', 256);
     return 0;
 }
