@@ -55,6 +55,51 @@ extern void print_bin_buffer(char* buffer, const uint8_t sep)
     }
 }
 
+void bin_to_baseN(const char* ibin, char** out_buff, size_t bits, int base) {
+    if (ibin == NULL || *ibin == '\0' || base < 2 || base > 36) {
+        printf("Invalid input or base!\n");
+        *out_buff = NULL;
+        return;
+    }
+
+    // Проверяем длину бинарной строки
+    size_t binaryLen = bits;
+
+    // Максимальная длина выходной строки (запас на случай больших оснований)
+    size_t outputLen = (binaryLen + (base == 2 ? 0 : 3)) / (base == 2 ? 1 : (base <= 16 ? 4 : 5)) + 1;
+    char* output = (char*)malloc(outputLen + 1); // Результирующий буфер
+    if (!output) {
+        printf("Allocation failed!\n");
+        *out_buff = NULL;
+        return;
+    }
+    output[outputLen] = '\0';
+
+    // Перевод бинарной строки в десятичное число
+    unsigned long long decimalValue = 0;
+    for (size_t i = 0; i < binaryLen; i++) {
+        decimalValue = (decimalValue << 1) + (ibin[i] - '0');
+    }
+
+    // Перевод десятичного числа в целевую систему счисления
+    size_t index = 0;
+    do {
+        int remainder = decimalValue % base;
+        output[index++] = remainder < 10 ? ('0' + remainder) : ('A' + remainder - 10);
+        decimalValue /= base;
+    } while (decimalValue > 0);
+
+    // Переворачиваем строку (т.к. запись шла с конца)
+    for (size_t i = 0; i < index / 2; i++) {
+        char temp = output[i];
+        output[i] = output[index - i - 1];
+        output[index - i - 1] = temp;
+    }
+
+    output[index] = '\0'; // Null-terminate результат
+    *out_buff = output;
+}
+
 void bin_hex(char* ibin, char** out_buff, size_t bits)
 {
     if (ibin == NULL || *ibin == '\0') {

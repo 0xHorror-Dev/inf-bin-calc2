@@ -117,7 +117,7 @@ void lshift(char* binary, size_t bits, size_t shift_count)
     }
 }
 
-int compareBinary(const char* dividend, const char* divisor) {
+int dcmp_bin(const char* dividend, const char* divisor) {
 
     // Получаем длины строк
 
@@ -148,7 +148,7 @@ int compareBinary(const char* dividend, const char* divisor) {
 
 }
 
-int compareBinaryle(const char* remainder, const char* divisor) {
+int dcmp_bin_le(const char* remainder, const char* divisor) {
 
     // Получаем длины строк
 
@@ -179,7 +179,6 @@ int compareBinaryle(const char* remainder, const char* divisor) {
 
 }
 
-
 extern int unsigned_divide(const char* n1, const char* n2, char** quotient, char** remainder, size_t bits) 
 {
     char* out = (char*)malloc(bits + 1);
@@ -192,11 +191,9 @@ extern int unsigned_divide(const char* n1, const char* n2, char** quotient, char
     strcpy(divisor, n2);
 
     size_t sc = 0;
-    while (compareBinary(dividend, divisor))
+    while (dcmp_bin(dividend, divisor))
     {
-        puts(divisor);
         lshift(divisor, bits - 1, 1);
-        puts(divisor);
         sc += 1;
     }
 
@@ -217,7 +214,7 @@ extern int unsigned_divide(const char* n1, const char* n2, char** quotient, char
     {
         lshift(q, bits, 1);
 
-        if (compareBinaryle(r, divisor))
+        if (dcmp_bin_le(r, divisor))
         {
             char* tmp = NULL;
             unsigned_binary_subtract(r, divisor, &tmp, bits);

@@ -2,8 +2,19 @@
 //#define SEP_CONST -1
 #define SEP_CONST 4
 
+uint8_t pow2check(int32_t n) {
+    return (n > 0) && ((n & (n - 1)) == 0);
+}
+
 void perform_operation(const char* x, const char* y, const uint8_t base, const char op, const size_t bits)
 {
+    if (!pow2check(bits))
+    {
+        printf("%zu not power of two!", bits);
+        return;
+    }
+
+
     char* xb = malloc(bits + 1);
     char* yb = malloc(bits + 1);
     char* res_buff = malloc(bits + 1);
@@ -115,10 +126,10 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
 
 int main()
 {
-    //perform_operation("-12", "10", 10, '+', 32);
-    //perform_operation("-12", "-10", 10, '*', 32);
-    //perform_operation("-12", "10", 10, '-', 32);
+    perform_operation("23847623876423784562378645238765428376548762354324234237642332423423423423423423423423423", "10", 10, '+', 1024);
+    perform_operation("-12", "-10", 10, '*', 32);
+    perform_operation("-12", "10", 10, '-', 32);
     perform_operation("116", "2", 10, '/', 32);
-    //perform_operation("20", "2", 10, '/', 256);
+    perform_operation("20", "2", 10, '/', 256);
     return 0;
 }
