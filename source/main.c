@@ -29,7 +29,7 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
     strcpy_s(xb, bits + 1, x);
     strcpy_s(yb, bits + 1, y);
     uint8_t is_gneg = 0;
-
+    char* q = NULL;
     if (base != 2)
     {
         uint8_t is_neg = 0;
@@ -77,9 +77,10 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
             printf("multiplication overflow!\n");
         }
         break;
+    case '%':
     case '/':
     {
-        char* q;
+
         if (singed_division(xb, yb, &res_buff, &q, bits) == 1)
         {
             printf("division overflow\n");
@@ -111,25 +112,75 @@ void perform_operation(const char* x, const char* y, const uint8_t base, const c
         break;
     }
 
-    print_bin_buffer(res_buff, SEP_CONST);
-    char* hex_out = NULL;
-    bin_hex(res_buff, &hex_out, bits);
-    putchar('|');
-    puts(hex_out);
-    putchar('\n');
-    free(hex_out);
+    if (op == '%')
+    {
+        print_bin_buffer(q, SEP_CONST);
+        char* hex_out = NULL;
+        bin_hex(q, &hex_out, bits);
+        putchar('|');
+        puts(hex_out);
+        putchar('\n');
+        free(hex_out);
+    }
+    else
+    {
+        print_bin_buffer(res_buff, SEP_CONST);
+        char* hex_out = NULL;
+        bin_hex(res_buff, &hex_out, bits);
+        putchar('|');
+        puts(hex_out);
+        putchar('\n');
+        free(hex_out);
+    }
 
     free(xb);
     free(yb);
     free(res_buff);
+    if (q != NULL)
+    {
+        free(q);
+    }
 }
 
 int main()
 {
-    perform_operation("23847623876423784562378645238765428376548762354324234237642332423423423423423423423423423", "10", 10, '+', 1024);
-    perform_operation("-12", "-10", 10, '*', 32);
-    perform_operation("-12", "10", 10, '-', 32);
-    perform_operation("116", "2", 10, '/', 32);
-    perform_operation("20", "2", 10, '/', 256);
+    size_t bits = 0;
+    uint16_t nums = 0;
+
+    printf("bits:");
+    scanf_s("%zu", &bits);
+    printf("numerical base:");
+    scanf_s("%hu", &nums);
+    
+    char* input_num1 = (char*)malloc(bits/8);
+    if (input_num1 == NULL)
+    {
+        printf("failed to allocate memory for input buffer");
+        return -1;
+    }
+    char* input_num2 = (char*)malloc(bits/8);
+    if (input_num2 == NULL)
+    {
+        free(input_num1);
+        printf("failed to allocate memory for input buffer");
+        return -1;
+    }
+
+    printf("enter first number:");
+    scanf(" %s", input_num1);
+    printf("enter second number number:");
+    scanf(" %s", input_num2);
+
+    perform_operation(input_num1, input_num2, nums, '+', bits);
+    perform_operation(input_num1, input_num2, nums, '-', bits);
+    perform_operation(input_num1, input_num2, nums, '*', bits);
+    perform_operation(input_num1, input_num2, nums, '/', bits);
+    perform_operation(input_num1, input_num2, nums, '%', bits);
+
+    //perform_operation("23847623876423784562378645238765428376548762354324234237642332423423423423423423423423423", "10", 10, '+', 1024);
+    //perform_operation("-12", "-10", 10, '*', 32);
+    //perform_operation("-12", "10", 10, '-', 32);
+    //perform_operation("116", "2", 10, '/', 32);
+    //perform_operation("20", "2", 10, '/', 256);
     return 0;
 }
